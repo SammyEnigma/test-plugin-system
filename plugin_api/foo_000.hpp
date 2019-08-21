@@ -3,11 +3,12 @@
 
 namespace plugin_api
 {
-    class IFoo000 final : public IBaseInterface
+    class IFoo000 : public IBaseInterface
     {
         DECL_INTERFACE(IFoo000, "Foo000");
 
+    public:
         virtual void FooA() const = 0;
         virtual bool FooB(int I_) const = 0;
-    }
+    };
 }

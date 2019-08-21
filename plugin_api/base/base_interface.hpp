@@ -5,7 +5,8 @@
     public: \
         __this_class__() = default; \
         virtual ~__this_class__() = default; \
-        std::string GetID() const override final { return (__sId__); }
+        static std::string GetInterfaceID() { return (__sId__); } \
+        std::string GetID() const override final { return __this_class__::GetInterfaceID(); }
 
 
 namespace plugin_api

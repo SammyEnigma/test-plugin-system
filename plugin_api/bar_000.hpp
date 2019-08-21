@@ -8,5 +8,5 @@ namespace plugin_api
         DECL_INTERFACE(IBar000, "Bar000");
 
         virtual void BarA() const = 0;
-    }
+    };
 }
