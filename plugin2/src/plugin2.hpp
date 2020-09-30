@@ -1,18 +1,15 @@
 #pragma once
 #include "plugin_api.hpp"
 
-namespace plugin2
+class CPlugin2 final : public plugin_api::IPlugin
 {
-    class CPlugin2 final : public plugin_api::IPlugin
-    {
 
-    public:
-        std::string GetName() const override;
-        std::string GetDescription() const override;
-        std::string GetShortDescription() const override;
-        void GetVersion(size_t &Major_, size_t &Minor_) const override;
-        void OnPluginLoaded() override;
-        void OnPluginUnloaded() override;
-        bool EventA(int A1_, int A2_) override;
-    };
-}
+public:
+    const char* GetName() const override;
+    const char* GetDescription() const override;
+    const char* GetShortDescription() const override;
+    void GetVersion(uint32_t& Major_, uint32_t& Minor_) const override;
+    void OnPluginLoaded() override;
+    void OnPluginUnloaded() override;
+    bool EventA(int A1_, int A2_) override;
+};

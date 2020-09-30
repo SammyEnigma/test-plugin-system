@@ -8,5 +8,5 @@ target_link_libraries(${PROJECT_NAME} plugin_api)
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 if(MSVC)
-    set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+    #set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()

@@ -1,49 +1,46 @@
 #include "plugin1.hpp"
 
 using namespace std;
-IMPL_PLUGIN(plugin1::CPlugin1);
+IMPL_PLUGIN(CPlugin1);
 
-namespace plugin1
+const char* CPlugin1::GetName() const
 {
-    string CPlugin1::GetName() const
-    {
-        return "Test plugin 1 (deprecated)";
-    }
-    
-
-    string CPlugin1::GetDescription() const
-    {
-        return "First created plugin";
-    }
+    return "Test plugin 1 (deprecated)";
+}
 
 
-    string CPlugin1::GetShortDescription() const
-    {
-        return "This plugin uses \"deprecated\" API to do some cool stuff";
-    }
+const char* CPlugin1::GetDescription() const
+{
+    return "First created plugin";
+}
 
 
-    void CPlugin1::GetVersion(size_t& Major_, size_t& Minor_) const
-    {
-        Major_ = 1;
-        Minor_ = 0;
-    }
-    
-
-    void CPlugin1::OnPluginLoaded()
-    {
-
-    }
+const char* CPlugin1::GetShortDescription() const
+{
+    return "This plugin uses \"deprecated\" API to do some cool stuff";
+}
 
 
-    void CPlugin1::OnPluginUnloaded()
-    {
+void CPlugin1::GetVersion(uint32_t& Major_, uint32_t& Minor_) const
+{
+    Major_ = 1;
+    Minor_ = 0;
+}
 
-    }
+
+void CPlugin1::OnPluginLoaded()
+{
+
+}
 
 
-    bool CPlugin1::EventA(int A1_) 
-    {
-        return A1_ < 0;
-    }
+void CPlugin1::OnPluginUnloaded()
+{
+
+}
+
+
+bool CPlugin1::EventA(int A1_)
+{
+    return A1_ < 0;
 }

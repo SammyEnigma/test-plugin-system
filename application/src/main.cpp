@@ -1,47 +1,37 @@
 #include <Windows.h>
 #include <iostream>
+#include <sstream>
 #include <memory>
+
 #include "base/base_plugin.hpp"
 
-using namespace std;
-using namespace plugin_api;
+using std::cout;
+using std::endl;
 
-static IBaseInterface* GetInterface(const char* InterfaceId_)
-{
-    return nullptr;
-}
 
 static bool LoadPlugin(const char* pName_)
 {
     cout << pName_ << ": attempting to load plugin" << endl;
-    HMODULE hPlugin = LoadLibraryA(pName_);
+    std::stringstream ss;
+    ss << PLUGIN_PREFIX << pName_ << PLUGIN_SUFFIX;
+    HMODULE hPlugin = LoadLibraryA(ss.str().c_str());
     if (!hPlugin)
     {
-        cout << pName_ << " not found" << endl;
+        cout << "Plugin " << pName_ << " can not be loaded: " << GetLastError() << endl;
         return false;
     }
 
-    FPPluginEntryPoint fpPluginEntryPoint = reinterpret_cast<FPPluginEntryPoint>(GetProcAddress(hPlugin, "PluginEntryPoint"));
-    if (!fpPluginEntryPoint)
+    auto fpCreatePlugin = reinterpret_cast<plugin_api::FPCreatePlugin>(GetProcAddress(hPlugin, "CreatePlugin"));
+    auto fpDestroyPlugin = reinterpret_cast<plugin_api::FPDestroyPlugin>(GetProcAddress(hPlugin, "DestroyPlugin"));
+    if (!fpCreatePlugin || !fpDestroyPlugin)
     {
-        cout << "Plugin entry point not found (missing IMPL_PLUGIN directive?)" << endl;
-        return false;
-    }
-
-    cout << pName_ << ": executing plugin entry point..." << endl;
-    fpPluginEntryPoint(&GetInterface);
-    cout << pName_ << ": plugin entry point passed" << endl;
-
-    FPCreatePlugin fpCreatePlugin = reinterpret_cast<FPCreatePlugin>(GetProcAddress(hPlugin, "CreatePlugin"));
-    if (!fpCreatePlugin)
-    {
-        cout << "Plugin creator function not found (missing IMPL_PLUGIN directive?)" << endl;
+        cout << "Plugin creator/destroy function not found (missing IMPL_PLUGIN directive?)" << endl;
         return false;
     }
 
     cout << pName_ << ": creating plugin instance..." << endl;
-    shared_ptr<IBasePlugin> spPlugin(fpCreatePlugin());
-    if (!spPlugin)
+    plugin_api::IBasePlugin* pPlugin = fpCreatePlugin();
+    if (!pPlugin)
     {
         cout << pName_ << ": unable to create plugin instance" << endl;
         return false;
@@ -49,19 +39,20 @@ static bool LoadPlugin(const char* pName_)
 
     cout << pName_ << ": plugin loaded successfully. Getting some information..." << endl;
 
-    cout << "Plugin name: " << spPlugin->GetName() << endl;
-    cout << "Plugin short description: " << spPlugin->GetShortDescription() << endl;
-    cout << "Plugin description: " << spPlugin->GetDescription() << endl;
-    size_t major = 0, minor = 0;
-    spPlugin->GetVersion(major, minor);
+    cout << "Plugin name: " << pPlugin->GetName() << endl;
+    cout << "Plugin short description: " << pPlugin->GetShortDescription() << endl;
+    cout << "Plugin description: " << pPlugin->GetDescription() << endl;
+    uint32_t major = 0, minor = 0;
+    pPlugin->GetVersion(major, minor);
     cout << "Plugin version: " << major << "." << minor << endl;
-    cout << "Plugin interface version: " << spPlugin->GetID() << endl;
+    cout << "Plugin interface version: " << pPlugin->GetID() << endl;
 
-    cout << spPlugin->GetName() << ": executing plugin OnPluginLoaded function..." << endl;
-    spPlugin->OnPluginLoaded();
-    cout << spPlugin->GetName() << ": seems fine, executing OnPluginUnloaded function..." << endl;
-    spPlugin->OnPluginUnloaded();
-    cout << spPlugin->GetName() << ": seems fine, killing plugin..." << endl;
+    cout << pPlugin->GetName() << ": executing plugin OnPluginLoaded function..." << endl;
+    pPlugin->OnPluginLoaded();
+    cout << pPlugin->GetName() << ": seems fine, executing OnPluginUnloaded function..." << endl;
+    pPlugin->OnPluginUnloaded();
+    cout << pPlugin->GetName() << ": seems fine, killing plugin..." << endl;
+    fpDestroyPlugin(pPlugin);
 
     cout << endl << endl << endl;
     return true;
@@ -69,10 +60,10 @@ static bool LoadPlugin(const char* pName_)
 
 int main()
 {
-    if (!LoadPlugin("libplugin2.dll"))
+    if (!LoadPlugin("plugin2"))
         return EXIT_FAILURE;
 
-    if (!LoadPlugin("libplugin1.dll"))
+    if (!LoadPlugin("plugin1"))
         return EXIT_FAILURE;
 
     cout << "Everything is fine :) Shutting down..." << endl;
