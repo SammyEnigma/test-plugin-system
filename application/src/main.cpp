@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "base/base_plugin.hpp"
+#include "interfaces/setup_interfaces.hpp"
 
 using std::cout;
 using std::endl;
@@ -60,6 +61,8 @@ static bool LoadPlugin(const char* pName_)
 
 int main()
 {
+    SetupInterfaces();
+
     if (!LoadPlugin("plugin2"))
         return EXIT_FAILURE;
 

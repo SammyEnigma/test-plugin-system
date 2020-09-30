@@ -46,6 +46,7 @@ void CPlugin2::OnPluginUnloaded()
     if (!pFoo)
         return;
 
+    pFoo->FooA();
     pFoo->FooB(10, 20);
 }
 
