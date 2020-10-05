@@ -1,15 +1,19 @@
 #include "plugin_api.hpp"
 
-#include "interface_storage.hpp"
 
+static FPHostGetInterface g_HostGetInterface;
 
-PLUGIN_API void* GetInterface(const char* Id_)
+PLUGIN_API int InitAPI(FPHostGetInterface HostGetInterface_)
 {
-    return CInterfacesStorage::Instance().GetInterface(Id_);
+    if (g_HostGetInterface)
+        return 0;
+
+    g_HostGetInterface = HostGetInterface_;
+    return 1;
 }
 
 
-PLUGIN_API void SetInterface(const char* Id_, void* IImpl_)
+PLUGIN_API plugin_api::IBaseInterface* GetInterface(const char* Id_)
 {
-    CInterfacesStorage::Instance().SetInterface(Id_, IImpl_);
+    return g_HostGetInterface ? g_HostGetInterface(Id_) : nullptr;
 }

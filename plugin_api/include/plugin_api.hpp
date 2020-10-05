@@ -5,22 +5,16 @@
 #include "interface/foo_001.hpp"
 #include "interface/bar_001.hpp"
 
-/// Return implementation of interface for its identifier \a Id_
-PLUGIN_API void* GetInterface(const char* Id_);
+using FPHostGetInterface = plugin_api::IBaseInterface* (_cdecl*)(const char* Id_);
+PLUGIN_API int InitAPI(FPHostGetInterface fpGetInterface_);
 
-/// Set implementation of interface with id \a Id_ to \a IImpl_
-PLUGIN_API void SetInterface(const char* Id_, void* IImpl_);
+/// Return implementation of interface for its identifier \a Id_
+PLUGIN_API plugin_api::IBaseInterface* GetInterface(const char* Id_);
 
 template<class T>
 T* GetInterface()
 {
-    return reinterpret_cast<T*>(GetInterface(T::GetInterfaceID()));
-}
-
-template<class T>
-void SetInterface(T* IImpl_)
-{
-    SetInterface(T::GetInterfaceID(), static_cast<void*>(IImpl_));
+    return dynamic_cast<T*>(GetInterface(T::GetInterfaceID()));
 }
 
 namespace plugin_api

@@ -1,31 +1,38 @@
 #include "setup_interfaces.hpp"
 
-#include "plugin_api.hpp"
+#include "interface_storage.hpp"
 
 #include "foo/foo000.hpp"
 #include "foo/foo001.hpp"
 #include "bar/bar000.hpp"
 #include "bar/bar001.hpp"
 
+#include "plugin_api.hpp"
 
 static void setupFoo()
 {
-    static CFoo000 foo000;
-    static CFoo001 foo001;
-    SetInterface(&foo000);
-    SetInterface(&foo001);
+    CInterfacesStorage& s = CInterfacesStorage::Instance();
+    s.RegisterImplementation<CFoo000>();
+    s.RegisterImplementation<CFoo001>();
 }
 
 static void setupBar()
 {
-    static CBar000 bar000;
-    static CBar001 bar001;
-    SetInterface(&bar000);
-    SetInterface(&bar001);
+    CInterfacesStorage& s = CInterfacesStorage::Instance();
+    s.RegisterImplementation<CBar000>();
+    s.RegisterImplementation<CBar001>();
+}
+
+plugin_api::IBaseInterface* HostGetInterface(const char* Id_)
+{
+    return CInterfacesStorage::Instance().GetInterface(Id_);
 }
 
 void SetupInterfaces()
 {
-    setupFoo();
-    setupBar();
+    if (InitAPI(HostGetInterface)) // Or else someone already did it. But how? Something weird.
+    {
+        setupFoo();
+        setupBar();
+    }
 }
